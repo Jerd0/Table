@@ -1,9 +1,4 @@
-
-## You can see the finished application [here](http://cold-teaching.surge.sh/)
-
-
-
-
+Была взата готовая таблица, и потихоньку переделена в то что нужно.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
