@@ -4,7 +4,11 @@ import Loader from './Loader/Loader';
 import Table from './Table/Table';
 import TableSearch from './TableSearch/TableSearch';
 import _ from 'lodash';
-
+import FormContainer from './containers/FormContainer';
+const bottomStyle = {
+  marginRight: '1em',
+  marginBottom: '1em'
+};
 class App extends Component {
 
   state ={
@@ -13,18 +17,40 @@ class App extends Component {
     data: [],
     search: '',
     sort: 'asc',  // 'desc'
-    sortField: 'name',
+    sortField: 'id',
     row: null,
     currentPage: 0,
   }
-  async fetchData(url) {
-    const response = await fetch(url)
+
+  async fetchData() {
+    const response = await fetch('http://localhost:3000/users')
     const data = await response.json()
     this.setState({
       isLoading: false,
       data: _.orderBy(data, this.state.sortField, this.state.sort)
     })
-
+  }
+  handleFormDelete(id) {
+    let userData = id;
+    console.log(userData)
+    fetch(`http://localhost:3000/users/${userData.id}`,{
+      method: "DELETE",
+      body: JSON.stringify(userData),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    }).then(response => {
+      response.json().then(this.fetchData())
+    })
+    this.handleRow()
+  }
+ handleRow=()=>{
+    this.setState({row: !this.state.row})
+ }
+  handleModal = () => {
+    this.setState({showModal: !this.state.showModal});
+  this.fetchData()
   }
   onSort = sortField => {
     const cloneData = this.state.data.concat();
@@ -33,13 +59,12 @@ class App extends Component {
     this.setState({ data, sort, sortField })
   }
 
-  modeSelectHandler = url => {
-    console.log(url)
+  modeSelectHandler = () => {
     this.setState({
       isModeSelected: true,
       isLoading: true,
     })
-    this.fetchData(url)
+    this.fetchData()
   }
 
   
@@ -57,11 +82,10 @@ class App extends Component {
 
   getFilteredData(){
     const {data, search} = this.state
-
     if (!search) {
       return data
     }
-   var result = data.filter(item => {
+   let result = data.filter(item => {
      return (
        item['name'].toLowerCase().includes(search.toLowerCase()) ||
        item['mission'].toLowerCase().includes(search.toLowerCase())
@@ -78,7 +102,7 @@ class App extends Component {
     if(!this.state.isModeSelected){
       return (
         <div className="container">
-          {this.modeSelectHandler('https://api.jsonbin.io/b/5ef4d2b2e2ce6e3b2c798573')}
+          {this.modeSelectHandler()}
         </div>
       )
     }
@@ -94,12 +118,19 @@ class App extends Component {
         ? <Loader />
         : <React.Fragment>
             <TableSearch onSearch={this.searchHandler}/>
-            <Table 
+            <div style={{display:'flex'}}>
+              <button style={bottomStyle} onClick={this.handleModal} className="btn btn-outline-primary">Добавить</button>
+            </div>
+              {this.state.showModal && <FormContainer handleModal={this.handleModal}/>}
+
+              <Table
               data={displayData}
               onSort={this.onSort}
               sort={this.state.sort}
               sortField={this.state.sortField}
               onRowSelect={this.onRowSelect}
+              delet={this.state.data}
+              onDelete={this.handleFormDelete}
             />
           </React.Fragment>
 
@@ -127,6 +158,9 @@ class App extends Component {
         forcePage={this.state.currentPage}
       /> : null
       }
+        {
+          this.state.row ? this.handleFormDelete(this.state.row) : null
+        }
       </div>
     );
   }
