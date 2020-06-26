@@ -14,7 +14,7 @@ export default props => {
               className="btn btn-outline-secondary"
               onClick={() => props.onSearch(value)}
             >
-              Search
+              Искать
             </button>
           </div>
           <input
@@ -30,6 +30,7 @@ export default props => {
             тогда все данные.
         </p>
         <p className="text-center">Чтобы отсортировать, нажмите на заголовок.</p>
+          <p className="text-center">Для обновления таблицы после добавления, требуется закрыть модальное окно. (нажать добавить)</p>
       </>
     );
 }

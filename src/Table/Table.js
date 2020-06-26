@@ -34,7 +34,6 @@ export default props => (
             {/*<td>{format(item.date, 'dd-MM-yyyy')}</td>*/}
             {/*<td>{(typeof (item.date))!=="number" ? item.days : format(item.date, 'dd-MM-yyyy') }</td>*/}
                 <td>{item.days}</td>
-                {console.log(typeof (item.date))}
             <td>{item.mission}</td>
            <td className="text-center"><input
                name="isGoing"

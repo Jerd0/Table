@@ -15,7 +15,6 @@ class FormContainer extends Component {
               isMultiple: true,
           }
       }
-      this.handleInputChange = this.handleInputChange.bind(this);
       this.handleDate = this.handleDate.bind(this);
       this.handleName = this.handleName.bind(this);
       this.handleDays = this.handleDays.bind(this);
@@ -25,15 +24,6 @@ class FormContainer extends Component {
       this.handleClearForm = this.handleClearForm.bind(this);
       this.handleInput = this.handleInput.bind(this);
   }
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.name === 'isMultiple' ? target.checked : target.value;
-        const name = target.name;
-        this.setState({
-            [name]: value    });
-    }
-
-  /* This lifecycle hook gets executed when the component mounts */
     handleIsMultiple(e) {
         let target = e.target;
         let value = target.name === 'isMultiple' ? target.checked : target.value;
@@ -65,11 +55,12 @@ class FormContainer extends Component {
         }))
     }
   handleDate(e) {
-       let value =parseInt(format(new Date(e.target.value), 'T'));
-   this.setState( prevState => ({ newUser : 
+        let value=e.target.value
+        this.setState( prevState => ({ newUser :
         {...prevState.newUser, date: value
         }
       }))
+
   }
   handleInput(e) {
       let value = e.target.value;
@@ -80,13 +71,11 @@ class FormContainer extends Component {
       }))
   }
 
-
-
   handleFormSubmit(e) {
     e.preventDefault();
     let userData = this.state.newUser;
-
-    fetch('http://localhost:3000/users/',{
+    userData.date=parseInt(format(new Date(userData.date), 'T'))
+       fetch('http://localhost:3000/users/',{
         method: "POST",
         body: JSON.stringify(userData),
         headers: {
@@ -95,7 +84,6 @@ class FormContainer extends Component {
         },
       }).then(response => {
         response.json()
-            // .then(data =>{this.fetchData()})
       })
       e.preventDefault();
       this.setState(  this.state = {
@@ -109,9 +97,7 @@ class FormContainer extends Component {
       })
 
   }
-
   handleClearForm(e) {
-  
       e.preventDefault();
       this.setState(  this.state = {
           newUser: {
@@ -125,7 +111,6 @@ class FormContainer extends Component {
   }
   render() {
     return (
-
         <form className="container-fluid" style={{border: '2px solid grey'}}  onSubmit={this.handleFormSubmit}>
             <div style={{display:'flex', width:'100%'}}>
             <Input inputType={'text'}
