@@ -2,8 +2,8 @@ import React from 'react';
 import {format} from 'date-fns'
 
 export default props => (
-  <table className="table" style={{ cursor: "pointer" }} >
-    <thead className="text-center">
+  <table className="table" >
+    <thead className="text-center"  style={{ cursor: "pointer" }}>
       <tr>
         <th onClick={props.onSort.bind(null, "name")}>
           Имя {props.sortField === "name" ? <small>{props.sort}</small> : null}
@@ -24,6 +24,9 @@ export default props => (
           Повторные полёты{" "}
           {props.sortField === "isMultiple" ? <small>{props.sort}</small> : null}
         </th>
+        <th>
+          Удалить
+        </th>
       </tr>
     </thead>
     <tbody className="text-left">
@@ -31,8 +34,6 @@ export default props => (
               <tr key={item.id}>
             <td>{item.name}</td>
                 <td>{(typeof (item.date))!=="number" ? item.days : format(item.date, 'dd-MM-yyyy') }</td>
-            {/*<td>{format(item.date, 'dd-MM-yyyy')}</td>*/}
-            {/*<td>{(typeof (item.date))!=="number" ? item.days : format(item.date, 'dd-MM-yyyy') }</td>*/}
                 <td>{item.days}</td>
             <td>{item.mission}</td>
            <td className="text-center"><input

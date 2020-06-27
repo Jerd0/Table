@@ -12,8 +12,9 @@ class FormContainer extends Component {
               date: '',
               days: '',
               mission: '',
-              isMultiple: true,
-          }
+              isMultiple: true
+          },
+          error: null
       }
       this.handleDate = this.handleDate.bind(this);
       this.handleName = this.handleName.bind(this);
@@ -22,7 +23,6 @@ class FormContainer extends Component {
       this.handleIsMultiple = this.handleIsMultiple.bind(this);
       this.handleFormSubmit = this.handleFormSubmit.bind(this);
       this.handleClearForm = this.handleClearForm.bind(this);
-      this.handleInput = this.handleInput.bind(this);
   }
     handleIsMultiple(e) {
         let target = e.target;
@@ -32,6 +32,7 @@ class FormContainer extends Component {
                 }
         }))
     }
+
     handleMission(e){
         let value=e.target.value;
         this.setState( prevState => ({ newUser :
@@ -41,7 +42,6 @@ class FormContainer extends Component {
     }
     handleDays(e) {
         let value = e.target.value;
-        value=parseInt(value)
         this.setState( prevState => ({ newUser :
                 {...prevState.newUser, days: value
                 }
@@ -62,44 +62,46 @@ class FormContainer extends Component {
       }))
 
   }
-  handleInput(e) {
-      let value = e.target.value;
-      let name = e.target.name;
-      this.setState( prevState => ({ newUser :
-              {...prevState.newUser, [name]: value
-              }
-      }))
-  }
 
   handleFormSubmit(e) {
-    e.preventDefault();
-    let userData = this.state.newUser;
-    userData.date=parseInt(format(new Date(userData.date), 'T'))
-       fetch('http://localhost:3000/users/',{
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-      }).then(response => {
-        response.json()
-      })
-      e.preventDefault();
-      this.setState(  this.state = {
-          newUser: {
-              name: '',
-              date: '',
-              days: '',
-              mission: '',
-              isMultiple: false,
-          }
-      })
-
+      try {
+          e.preventDefault();
+          const regExp=/\d/gi
+          const regExpStr=/[A-Za-zА-яа-яäöüßÄÖÜẞ ]/gi
+          const regExpMis=/./gi
+          let userData = this.state.newUser;
+          userData.date = parseInt(format(new Date(userData.date), 'T'))
+          userData.days=userData.days.match(regExp).join('')
+          userData.name=userData.name.match(regExpStr).join('')
+          userData.mission=userData.mission.match(regExpMis).join('')
+          fetch('http://localhost:3000/users/', {
+              method: "POST",
+              body: JSON.stringify(userData),
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+              },
+          }).then(response => {
+              response.json()
+          })
+          e.preventDefault();
+          this.setState({
+              newUser: {
+                  name: '',
+                  date: '',
+                  days: '',
+                  mission: '',
+                  isMultiple: false,
+              }
+          })
+      } catch (e) {
+          this.setState({ e });
+          alert('Вы допустили ошибку, пользователь не добавлен')
+      }
   }
   handleClearForm(e) {
       e.preventDefault();
-      this.setState(  this.state = {
+      this.setState(  {
           newUser: {
               name: '',
               date: '',
@@ -110,7 +112,7 @@ class FormContainer extends Component {
       })
   }
   render() {
-    return (
+          return (
         <form className="container-fluid" style={{border: '2px solid grey'}}  onSubmit={this.handleFormSubmit}>
             <div style={{display:'flex', width:'100%'}}>
             <Input inputType={'text'}
@@ -118,7 +120,8 @@ class FormContainer extends Component {
                    name= {'name'}
                    value={this.state.newUser.name}
                    placeholder = {'Введите имя'}
-                   handleChange = {this.handleInput}
+                   handleChange = {this.handleName}
+                   pattern=".{1,}" required
 
                    />
           <Input inputType={'Date'}
@@ -127,20 +130,23 @@ class FormContainer extends Component {
                  value={this.state.newUser.date}
                  placeholder = {'Первый полёт'}
                  handleChange={this.handleDate}
+                 required
                  />
             <Input inputType={'text'}
                    name={'mission'}
                    title= {'Название миссии'}
                    value={this.state.newUser.mission}
                    placeholder = {'Введите название миссии'}
-                   handleChange={this.handleInput}
+                   handleChange={this.handleMission}
+                   pattern=".{1,}" required
             />
             <Input inputType={'number'}
                    name={'days'}
                    title= {'Дней в космосе'}
                    value={this.state.newUser.days}
                    placeholder = {'Введите количество дней в космосе'}
-                   handleChange={this.handleInput}
+                   handleChange={this.handleDays}
+                   required
             />
             <Input inputType={'checkbox'}
                 name={'isMultiple'}

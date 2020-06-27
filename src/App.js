@@ -6,8 +6,7 @@ import TableSearch from './TableSearch/TableSearch';
 import _ from 'lodash';
 import FormContainer from './containers/FormContainer';
 const bottomStyle = {
-  marginRight: '1em',
-  marginBottom: '1em'
+    margin:'1em'
 };
 class App extends Component {
 
@@ -20,7 +19,7 @@ class App extends Component {
     sortField: 'id',
     row: null,
     currentPage: 0,
-      add:null
+      showModal:false
   }
 
   async fetchData() {
@@ -33,7 +32,6 @@ class App extends Component {
   }
   handleFormDelete(id) {
     let userData = id;
-    console.log(userData)
     fetch(`http://localhost:3000/users/${userData.id}`,{
       method: "DELETE",
       body: JSON.stringify(userData),
@@ -48,10 +46,6 @@ class App extends Component {
   }
  handleRow=()=>{
     this.setState({row: !this.state.row})
- }
- handleAdd=()=>{
-      this.setState({add: !this.state.add})
-     this.fetchData()
  }
   handleModal = () => {
     this.setState({showModal: !this.state.showModal});
@@ -123,11 +117,15 @@ class App extends Component {
         ? <Loader />
         : <React.Fragment>
             <TableSearch onSearch={this.searchHandler}/>
-            <div style={{display:'flex'}}>
-              <button style={bottomStyle} onClick={this.handleModal} className="btn btn-outline-primary">Добавить</button>
-            </div>
-              {this.state.showModal && <FormContainer
-                  handleModal={this.handleModal}/>}
+                {this.state.showModal && <FormContainer
+                    handleModal={this.handleModal}/>}
+
+                {!this.state.showModal ?
+                    <button style={bottomStyle} onClick={this.handleModal} className="btn btn-outline-primary">Открыть меню добавления</button>
+                    :
+                    <button style={bottomStyle} onClick={this.handleModal} className="btn btn-outline-primary">Закрыть и добавить</button>
+                }
+
 
               <Table
               data={displayData}
